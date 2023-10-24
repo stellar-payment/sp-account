@@ -27,5 +27,30 @@ func Init(params *InitRouterParams) {
 		middleware.HandlerLogger(&params.Logger),
 	)
 
-	params.Ec.GET(PingPath, handler.HandlePing(params.Service.Ping))
+	plainRouter := params.Ec.Group("")
+	secureRouter := params.Ec.Group("", middleware.AuthorizationMiddleware(params.Service))
+
+	// ----- Maintenance
+	plainRouter.GET(PingPath, handler.HandlePing(params.Service.Ping))
+
+	// ----- Auth
+	plainRouter.POST(authSignup, handler.HandleSignup(params.Service.AuthSignup))
+	plainRouter.OPTIONS(authSignup, handler.HandleSignup(params.Service.AuthSignup))
+	plainRouter.POST(authLogin, handler.HandleAuthLogin(params.Service.AuthLogin))
+	plainRouter.OPTIONS(authLogin, handler.HandleAuthLogin(params.Service.AuthLogin))
+
+	// ----- Users
+	secureRouter.GET(userBasepath, handler.HandleGetUsers(params.Service.GetAllUser))
+	secureRouter.OPTIONS(userBasepath, handler.HandleGetUsers(params.Service.GetAllUser))
+	secureRouter.GET(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
+	secureRouter.OPTIONS(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
+	secureRouter.GET(userIDPath, handler.HandleGetUserByID(params.Service.GetUser))
+	secureRouter.OPTIONS(userIDPath, handler.HandleGetUserByID(params.Service.GetUser))
+	secureRouter.POST(userBasepath, handler.HandleCreateUsers(params.Service.CreateUser))
+	secureRouter.OPTIONS(userBasepath, handler.HandleCreateUsers(params.Service.CreateUser))
+	secureRouter.PUT(userIDPath, handler.HandleUpdateUsers(params.Service.UpdateUser))
+	secureRouter.OPTIONS(userIDPath, handler.HandleUpdateUsers(params.Service.UpdateUser))
+	secureRouter.DELETE(userIDPath, handler.HandleDeleteUser(params.Service.DeleteUser))
+	secureRouter.OPTIONS(userIDPath, handler.HandleDeleteUser(params.Service.DeleteUser))
+
 }

@@ -1,0 +1,3 @@
+package inconst
+
+const ()

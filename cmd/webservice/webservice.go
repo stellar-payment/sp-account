@@ -4,40 +4,38 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/stellar-payment/sp-account/cmd/webservice/router"
+	"github.com/stellar-payment/sp-account/internal/component"
 	"github.com/stellar-payment/sp-account/internal/config"
 	"github.com/stellar-payment/sp-account/internal/repository"
 	"github.com/stellar-payment/sp-account/internal/service"
 )
 
-const logTagStartWebservice = "[StartWebservice]"
-
 func Start(conf *config.Config, logger zerolog.Logger) {
-	// db, err := component.InitMariaDB(&component.InitMariaDBParams{
-	// 	Conf:   &conf.MariaDBConfig,
-	// 	Logger: logger,
-	// })
+	db, err := component.InitPostgres(&component.InitPostgresParams{
+		Conf:   &conf.PostgresConfig,
+		Logger: logger,
+	})
 
-	// if err != nil {
-	// 	logger.Fatalf("%s initializing maria db: %+v", logTagStartWebservice, err)
-	// }
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to initialize db")
+	}
 
-	// redis, err := component.InitRedis(&component.InitRedisParams{
-	// 	Conf:   &conf.RedisConfig,
-	// 	Logger: logger,
-	// })
+	redis, err := component.InitRedis(&component.InitRedisParams{
+		Conf:   &conf.RedisConfig,
+		Logger: logger,
+	})
 
-	// if err != nil {
-	// 	logger.Fatalf("%s initalizing redis: %+v", logTagStartWebservice, err)
-	// }
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to initalize redis")
+	}
 
 	ec := echo.New()
 	ec.HideBanner = true
 	ec.HidePort = true
 
 	repo := repository.NewRepository(&repository.NewRepositoryParams{
-		// MariaDB: db,
-		// MongoDB:    mongo,
-		// Redis: redis,
+		DB:    db,
+		Redis: redis,
 	})
 
 	service := service.NewService(&service.NewServiceParams{

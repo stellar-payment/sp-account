@@ -6,10 +6,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
-	"github.com/stellar-payment/sp-account/internal/commonkey"
-	"github.com/stellar-payment/sp-account/internal/indto"
 	"github.com/stellar-payment/sp-account/internal/service"
-	"github.com/stellar-payment/sp-account/internal/util/ctxutil"
 )
 
 var (
@@ -38,7 +35,6 @@ func NewFileSub(params NewFilePubSubParams) *FilePubSub {
 
 func (pb *FilePubSub) Listen() {
 	ctx := context.Background()
-	ctx = ctxutil.WrapCtx(ctx, commonkey.SCOPE_CTX_KEY, indto.UserScopeMap{})
 
 	subscriber := pb.redis.Subscribe(ctx, "")
 

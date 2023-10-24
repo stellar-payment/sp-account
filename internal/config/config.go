@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
 )
 
@@ -22,8 +23,17 @@ type Config struct {
 	FilePath  string
 	RunSince  time.Time
 
-	MariaDBConfig MariaDBConfig `json:"mariaDBConfig"`
-	RedisConfig   RedisConfig   `json:"redisConfig"`
+	FFJsonLogger string
+
+	AT_EXPIRY          time.Duration
+	JWT_ISSUER         string
+	JWT_AT_EXPIRATION  time.Duration
+	JWT_RT_EXPIRATION  time.Duration
+	JWT_SIGNING_METHOD jwt.SigningMethod
+	JWT_SIGNATURE_KEY  []byte
+
+	PostgresConfig PostgresConfig `json:"mariaDBConfig"`
+	RedisConfig    RedisConfig    `json:"redisConfig"`
 }
 
 const logTagConfig = "[Init Config]"
@@ -38,21 +48,23 @@ func Init(buildTime, buildVer string) {
 		ServiceAddress: os.Getenv("SERVICE_ADDR"),
 		ServiceID:      os.Getenv("SERVICE_ID"),
 		RPCAddress:     os.Getenv("GPRC_ADDR"),
-		MariaDBConfig: MariaDBConfig{
-			Address:            os.Getenv("MARIADB_ADDRESS"),
-			Username:           os.Getenv("MARIADB_USERNAME"),
-			Password:           os.Getenv("MARIADB_PASSWORD"),
-			DBName:             os.Getenv("MARIADB_DBNAME"),
+		PostgresConfig: PostgresConfig{
+			Address:            os.Getenv("POSTGRES_ADDRESS"),
+			Username:           os.Getenv("POSTGRES_USERNAME"),
+			Password:           os.Getenv("POSTGRES_PASSWORD"),
+			DBName:             os.Getenv("POSTGRES_DBNAME"),
 			FFIgnoreMigrations: os.Getenv("FF_MDB_IGNORE_MIGRATIONS"),
 		},
 		RedisConfig: RedisConfig{
-			Address:  os.Getenv("REDIS_ADDRESS"),
-			Port:     os.Getenv("REDIS_PORT"),
-			Password: os.Getenv("REDIS_PASSWORD"),
+			Address:    os.Getenv("REDIS_ADDRESS"),
+			Port:       os.Getenv("REDIS_PORT"),
+			Password:   os.Getenv("REDIS_PASSWORD"),
+			DefaultExp: 48 * time.Hour,
 		},
-		BuildVer:  buildVer,
-		BuildTime: buildTime,
-		FilePath:  os.Getenv("FILE_PATH"),
+		BuildVer:     buildVer,
+		BuildTime:    buildTime,
+		FilePath:     os.Getenv("FILE_PATH"),
+		FFJsonLogger: os.Getenv("FF_OVERRIDE_JSON_LOGGER"),
 	}
 
 	if conf.ServiceName == "" {
@@ -63,7 +75,7 @@ func Init(buildTime, buildVer string) {
 		log.Fatalf("%s service port should not be empty", logTagConfig)
 	}
 
-	if conf.MariaDBConfig.Address == "" || conf.MariaDBConfig.DBName == "" {
+	if conf.PostgresConfig.Address == "" || conf.PostgresConfig.DBName == "" {
 		log.Fatalf("%s address and db name cannot be empty", logTagConfig)
 	}
 
@@ -84,6 +96,13 @@ func Init(buildTime, buildVer string) {
 			}
 		}
 	}
+
+	conf.JWT_ISSUER = os.Getenv("JWT_ISSUER")
+	conf.JWT_SIGNING_METHOD = jwt.SigningMethodHS256
+	conf.JWT_SIGNATURE_KEY = []byte(os.Getenv("JWT_SIGNATURE_KEY"))
+	conf.JWT_AT_EXPIRATION = time.Duration(2) * time.Hour
+	conf.JWT_RT_EXPIRATION = time.Duration(7*24) * time.Hour
+	conf.AT_EXPIRY = time.Duration(24) * time.Hour
 
 	conf.RunSince = time.Now()
 	config = &conf
