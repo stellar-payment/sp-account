@@ -229,3 +229,19 @@ func (s *service) DeleteUser(ctx context.Context, params *dto.UsersQueryParams) 
 
 	return
 }
+
+func (s *service) HandleDeleteUser(ctx context.Context, params *indto.User) (err error) {
+	logger := log.Ctx(ctx)
+
+	if ok := scopeutil.ValidateScope(ctx, inconst.ROLE_ADMIN); !ok {
+		return errs.ErrNoAccess
+	}
+
+	err = s.repository.DeleteUser(ctx, &indto.UserParams{UserID: params.UserID})
+	if err != nil {
+		logger.Error().Err(err).Send()
+		return
+	}
+
+	return
+}

@@ -3,12 +3,17 @@ package service
 import (
 	"context"
 
+	"github.com/go-redis/redis/v8"
+	"github.com/stellar-payment/sp-account/internal/indto"
 	"github.com/stellar-payment/sp-account/internal/repository"
 	"github.com/stellar-payment/sp-account/pkg/dto"
 )
 
 type Service interface {
 	Ping() (pingResponse dto.PublicPingResponse)
+
+	// ----- Register
+	RegisterCustomer(ctx context.Context, payload *dto.RegisterCustomerPayload) (err error)
 
 	// ----- Auth
 	AuthSignup(ctx context.Context, payload *dto.UserPayload) (err error)
@@ -22,10 +27,12 @@ type Service interface {
 	CreateUser(ctx context.Context, payload *dto.UserPayload) (err error)
 	UpdateUser(ctx context.Context, params *dto.UsersQueryParams, payload *dto.UserPayload) (err error)
 	DeleteUser(ctx context.Context, params *dto.UsersQueryParams) (err error)
+	HandleDeleteUser(ctx context.Context, params *indto.User) (err error)
 }
 
 type service struct {
 	conf       *serviceConfig
+	redis      *redis.Client
 	repository repository.Repository
 }
 
@@ -34,11 +41,13 @@ type serviceConfig struct {
 
 type NewServiceParams struct {
 	Repository repository.Repository
+	Redis      *redis.Client
 }
 
 func NewService(params *NewServiceParams) Service {
 	return &service{
 		conf:       &serviceConfig{},
 		repository: params.Repository,
+		redis:      params.Redis,
 	}
 }

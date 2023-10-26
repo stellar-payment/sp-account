@@ -33,11 +33,15 @@ func Init(params *InitRouterParams) {
 	// ----- Maintenance
 	plainRouter.GET(PingPath, handler.HandlePing(params.Service.Ping))
 
+	// ----- Register
+	plainRouter.POST(registerCustomerPath, handler.HandleRegisterCustomer(params.Service.RegisterCustomer))
+	plainRouter.OPTIONS(registerCustomerPath, handler.HandleRegisterCustomer(params.Service.RegisterCustomer))
+
 	// ----- Auth
-	plainRouter.POST(authSignup, handler.HandleSignup(params.Service.AuthSignup))
-	plainRouter.OPTIONS(authSignup, handler.HandleSignup(params.Service.AuthSignup))
-	plainRouter.POST(authLogin, handler.HandleAuthLogin(params.Service.AuthLogin))
-	plainRouter.OPTIONS(authLogin, handler.HandleAuthLogin(params.Service.AuthLogin))
+	plainRouter.POST(authSignupPath, handler.HandleSignup(params.Service.AuthSignup))
+	plainRouter.OPTIONS(authSignupPath, handler.HandleSignup(params.Service.AuthSignup))
+	plainRouter.POST(authLoginPath, handler.HandleAuthLogin(params.Service.AuthLogin))
+	plainRouter.OPTIONS(authLoginPath, handler.HandleAuthLogin(params.Service.AuthLogin))
 
 	// ----- Users
 	secureRouter.GET(userBasepath, handler.HandleGetUsers(params.Service.GetAllUser))
