@@ -14,6 +14,7 @@ type Service interface {
 
 	// ----- Register
 	RegisterCustomer(ctx context.Context, payload *dto.RegisterCustomerPayload) (err error)
+	RegisterMerchant(ctx context.Context, payload *dto.RegisterMerchantPayload) (err error)
 
 	// ----- Auth
 	AuthSignup(ctx context.Context, payload *dto.UserPayload) (err error)

@@ -65,3 +65,57 @@ func (s *service) RegisterCustomer(ctx context.Context, payload *dto.RegisterCus
 
 	return
 }
+
+func (s *service) RegisterMerchant(ctx context.Context, payload *dto.RegisterMerchantPayload) (err error) {
+	logger := log.Ctx(ctx)
+
+	if val := structutil.CheckMandatoryField(payload); val != "" {
+		logger.Error().Msgf("field %s is missing a value", val)
+		return errs.New(errs.ErrMissingRequiredAttribute, val)
+	}
+
+	if exists, err := s.repository.FindUser(ctx, &indto.UserParams{Username: payload.Username}); err != nil {
+		logger.Error().Err(err).Send()
+		return err
+	} else if exists != nil {
+		return errs.ErrDuplicatedResources
+	}
+
+	userModel := &model.User{
+		UserID:   uuid.NewString(),
+		Username: payload.Username,
+		Password: "",
+		RoleID:   inconst.ROLE_MERCHANT,
+	}
+
+	if hashed, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost); err != nil {
+		logger.Error().Err(err).Msg("failed to hash password")
+		return err
+	} else {
+		userModel.Password = string(hashed)
+	}
+
+	err = s.repository.InsertUser(ctx, userModel)
+	if err != nil {
+		logger.Error().Err(err).Send()
+		return
+	}
+
+	err = s.publishEvent(ctx, inconst.TOPIC_CREATE_MERCHANT, &indto.Merchant{
+		UserID:       userModel.UserID,
+		LegalName:    payload.LegalName,
+		Phone:        payload.Phone,
+		Address:      payload.Address,
+		Email:        payload.Email,
+		PICName:      payload.PICName,
+		PICEmail:     payload.PICEmail,
+		PICPhone:     payload.PICPhone,
+		PhotoProfile: payload.PhotoProfile,
+	})
+	if err != nil {
+		logger.Error().Err(err).Send()
+		return
+	}
+
+	return
+}

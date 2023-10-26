@@ -36,6 +36,8 @@ func Init(params *InitRouterParams) {
 	// ----- Register
 	plainRouter.POST(registerCustomerPath, handler.HandleRegisterCustomer(params.Service.RegisterCustomer))
 	plainRouter.OPTIONS(registerCustomerPath, handler.HandleRegisterCustomer(params.Service.RegisterCustomer))
+	plainRouter.POST(registerMerchantPath, handler.HandleRegisterMerchant(params.Service.RegisterMerchant))
+	plainRouter.OPTIONS(registerMerchantPath, handler.HandleRegisterMerchant(params.Service.RegisterMerchant))
 
 	// ----- Auth
 	plainRouter.POST(authSignupPath, handler.HandleSignup(params.Service.AuthSignup))
