@@ -1,7 +1,7 @@
 package router
 
 const (
-	basePath = "/api/v1"
+	basePath = "/account/api/v1"
 	PingPath = basePath + "/ping"
 
 	// ----- Auth
