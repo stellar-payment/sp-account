@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/stellar-payment/sp-account/internal/component"
 	"github.com/stellar-payment/sp-account/internal/inconst"
 	"github.com/stellar-payment/sp-account/internal/indto"
 	"github.com/stellar-payment/sp-account/internal/model"
@@ -231,7 +232,7 @@ func (s *service) DeleteUser(ctx context.Context, params *dto.UsersQueryParams) 
 }
 
 func (s *service) HandleDeleteUser(ctx context.Context, params *indto.User) (err error) {
-	logger := log.Ctx(ctx)
+	logger := component.GetLogger()
 
 	if ok := scopeutil.ValidateScope(ctx, inconst.ROLE_ADMIN); !ok {
 		return errs.ErrNoAccess
