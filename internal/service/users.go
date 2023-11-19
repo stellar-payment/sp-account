@@ -70,7 +70,7 @@ func (s *service) GetAllUser(ctx context.Context, params *dto.UsersQueryParams) 
 		temp := &dto.UserResponse{
 			UserID:   v.UserID,
 			Username: v.Username,
-			RoleID:   0,
+			RoleID:   v.RoleID,
 		}
 
 		res.Users = append(res.Users, temp)
