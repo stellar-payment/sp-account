@@ -156,7 +156,7 @@ func (s *service) CreateUser(ctx context.Context, payload *dto.UserPayload) (err
 		UserID:   uuid.NewString(),
 		Username: payload.Username,
 		Password: "",
-		RoleID:   0,
+		RoleID:   payload.RoleID,
 	}
 
 	if hashed, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost); err != nil {
