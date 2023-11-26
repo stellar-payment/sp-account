@@ -62,7 +62,7 @@ func (pb *EventPubSub) Listen() {
 				continue
 			}
 		case inconst.TOPIC_REQUEST_SECURE_ROUTE:
-			data := fmt.Sprintf("%s,%s", "payment", strings.Join(pb.secureRoutes, ","))
+			data := fmt.Sprintf("%s,%s", "account", strings.Join(pb.secureRoutes, ","))
 			pb.redis.Publish(context.Background(), inconst.TOPIC_BROADCAST_SECURE_ROUTE, data)
 		}
 	}
