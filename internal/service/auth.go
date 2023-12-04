@@ -80,11 +80,11 @@ func (s *service) AuthLogin(ctx context.Context, payload *dto.AuthLoginPayload) 
 	}
 
 	token := sessionutil.GenerateSessionKey()
-	err = s.repository.InvalidateSessionToken(ctx, user)
-	if err != nil {
-		logger.Error().Err(err).Msg("failed to invalidate user session")
-		return nil, err
-	}
+	// err = s.repository.InvalidateSessionToken(ctx, user)
+	// if err != nil {
+	// 	logger.Error().Err(err).Msg("failed to invalidate user session")
+	// 	return nil, err
+	// }
 
 	err = s.repository.InsertSessionToken(ctx, user, token)
 	if err != nil {
