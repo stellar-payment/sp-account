@@ -20,6 +20,7 @@ var (
 	ErrTokenExpired             = errors.New("user token already expired")
 	ErrUserExisted              = errors.New("user already existed")
 	ErrUserDeactivated          = errors.New("user is deactivated")
+	ErrUserSessionExpired       = errors.New("session expired")
 	ErrMissingRequiredAttribute = errors.New("attribute %s is missing")
 )
 
@@ -62,6 +63,7 @@ const (
 	ErrCodeBrokenUserReq            constant.ErrCode = 422016
 	ErrCodeNotFound                 constant.ErrCode = 404017
 	ErrCodeMissingRequiredAttribute constant.ErrCode = 400018
+	ErrCodeUserSessionExpired       constant.ErrCode = 403019
 	ErrCodeTokenExpired             constant.ErrCode = 403021
 	ErrCodeUserExisted              constant.ErrCode = 400022
 	ErrCodeUserDeactivated          constant.ErrCode = 403023
@@ -88,6 +90,7 @@ var errorMap = map[error]dto.ErrorResponse{
 	ErrUserExisted:              ErrorResponse(ErrStatusClient, ErrCodeUserExisted, ErrDuplicatedResources),
 	ErrUserDeactivated:          ErrorResponse(ErrStatusNoAccess, ErrCodeUserDeactivated, ErrUserDeactivated),
 	ErrMissingRequiredAttribute: ErrorResponse(ErrStatusClient, ErrCodeMissingRequiredAttribute, ErrMissingRequiredAttribute),
+	ErrUserSessionExpired:       ErrorResponse(ErrStatusNoAccess, ErrCodeUserSessionExpired, ErrUserSessionExpired),
 }
 
 func ErrorResponse(status int, code constant.ErrCode, err error) dto.ErrorResponse {

@@ -8,6 +8,7 @@ const (
 
 const (
 	AUTH_CTX_KEY CtxKey = "auth-ctx"
+	AT_CTX_KEY   CtxKey = "at-ctx"
 	MID_CTX_KEY  CtxKey = "mid-ctx"
 )
 

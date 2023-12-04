@@ -108,11 +108,16 @@ func (s *service) GetUser(ctx context.Context, params *dto.UsersQueryParams) (re
 func (s *service) GetUserMe(ctx context.Context) (res *dto.UserResponse, err error) {
 	logger := log.Ctx(ctx)
 
-	if ok := scopeutil.ValidateScope(ctx, inconst.ROLE_ADMIN, inconst.ROLE_CUSTOMER, inconst.ROLE_MERCHANT); !ok {
-		return nil, errs.ErrNoAccess
-	}
-
+	bearer, _ := ctxutil.GetCtx[string](ctx, inconst.AT_CTX_KEY)
 	ctxmeta := ctxutil.GetUserCTX(ctx)
+
+	_, err = s.repository.FindSessionByToken(ctx, &indto.UserAccess{AccessToken: bearer})
+	if err != nil && err != errs.ErrInvalidCred {
+		logger.Error().Err(err).Send()
+		return
+	} else if err == errs.ErrInvalidCred {
+		return nil, errs.ErrUserSessionExpired
+	}
 
 	data, err := s.repository.FindUser(ctx, &indto.UserParams{UserID: ctxmeta.UserID})
 	if err != nil {

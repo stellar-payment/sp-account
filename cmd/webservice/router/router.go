@@ -28,6 +28,7 @@ func Init(params *InitRouterParams) {
 	)
 
 	plainRouter := params.Ec.Group("")
+	optionalRouter := params.Ec.Group("", middleware.OptionalAuthorizationMiddleware(params.Service))
 	secureRouter := params.Ec.Group("", middleware.AuthorizationMiddleware(params.Service))
 
 	// ----- Maintenance
@@ -48,8 +49,8 @@ func Init(params *InitRouterParams) {
 	// ----- Users
 	secureRouter.GET(userBasepath, handler.HandleGetUsers(params.Service.GetAllUser))
 	secureRouter.OPTIONS(userBasepath, handler.HandleGetUsers(params.Service.GetAllUser))
-	secureRouter.GET(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
-	secureRouter.OPTIONS(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
+	optionalRouter.GET(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
+	optionalRouter.OPTIONS(userMePath, handler.HandleGetUserMe(params.Service.GetUserMe))
 	secureRouter.GET(userIDPath, handler.HandleGetUserByID(params.Service.GetUser))
 	secureRouter.OPTIONS(userIDPath, handler.HandleGetUserByID(params.Service.GetUser))
 	secureRouter.POST(userBasepath, handler.HandleCreateUsers(params.Service.CreateUser))
