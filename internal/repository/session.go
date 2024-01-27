@@ -56,28 +56,28 @@ func (r *repository) InsertSessionToken(ctx context.Context, usr *indto.User, to
 	return
 }
 
-// func (r *repository) InvalidateSessionToken(ctx context.Context, usr *indto.User) (err error) {
-// 	logger := zerolog.Ctx(ctx)
+func (r *repository) InvalidateSessionToken(ctx context.Context, usr *indto.User) (err error) {
+	logger := zerolog.Ctx(ctx)
 
-// 	activeToken, err := r.redis.Get(ctx, fmt.Sprintf(USER_TOKEN, usr.UserID)).Result()
-// 	if errors.Is(err, redis.Nil) {
-// 		return nil
-// 	} else if err != nil {
-// 		logger.Error().Msgf("redis err: %+v", err)
-// 		return err
-// 	}
+	activeToken, err := r.redis.Get(ctx, fmt.Sprintf(USER_TOKEN, usr.UserID)).Result()
+	if errors.Is(err, redis.Nil) {
+		return nil
+	} else if err != nil {
+		logger.Error().Msgf("redis err: %+v", err)
+		return err
+	}
 
-// 	err = r.redis.Del(ctx, fmt.Sprintf(SESSION_TOKEN, activeToken)).Err()
-// 	if err != nil {
-// 		logger.Error().Msgf("redis err: %+v", err)
-// 		return err
-// 	}
+	err = r.redis.Del(ctx, fmt.Sprintf(SESSION_TOKEN, activeToken)).Err()
+	if err != nil {
+		logger.Error().Msgf("redis err: %+v", err)
+		return err
+	}
 
-// 	err = r.redis.Del(ctx, fmt.Sprintf(USER_TOKEN, usr.UserID)).Err()
-// 	if err != nil {
-// 		logger.Error().Msgf("redis err: %+v", err)
-// 		return err
-// 	}
+	err = r.redis.Del(ctx, fmt.Sprintf(USER_TOKEN, usr.UserID)).Err()
+	if err != nil {
+		logger.Error().Msgf("redis err: %+v", err)
+		return err
+	}
 
-// 	return
-// }
+	return
+}

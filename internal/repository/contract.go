@@ -23,7 +23,7 @@ type Repository interface {
 	// ----- Session
 	FindSessionByToken(ctx context.Context, usr *indto.UserAccess) (res *indto.User, err error)
 	InsertSessionToken(ctx context.Context, usr *indto.User, token string) (err error)
-	// InvalidateSessionToken(ctx context.Context, usr *indto.User) (err error)
+	InvalidateSessionToken(ctx context.Context, usr *indto.User) (err error)
 }
 
 type repository struct {
